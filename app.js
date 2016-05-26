@@ -13,26 +13,8 @@ var auth = require('./routes/auth');
 
 var app = express();
 //google
-var GOOGLE_CLIENT_ID = '525982938373-j974kitld043re3hs9ug5tuitpkiso9f.apps.googleusercontent.com';
-var GOOGLE_CLIENT_SECRET = 'LusXOdpuZuS48C_Gj8Bqywa_';
 
-var GoogleStrategy = require('passport-google-oauth20').Strategy;
-passport.use(new GoogleStrategy({
-    clientID: GOOGLE_CLIENT_ID,
-    clientSecret: GOOGLE_CLIENT_SECRET,
-    callbackURL: "http://localhost:3000/auth/google/callback"
-  },
-  function(accessToken, refreshToken, profile, done) {
-      console.log('googleId: '+ profile.id);
-      console.log('accessToken: '+ accessToken);
-      console.log('refreshToken: '+ refreshToken);
-      console.log('profile: '+profile.json);
-      done(null, profile);
-  }
-    // User.findOrCreate({ googleId: profile.id }, function (err, user) {
-    //   return cb(err, user);
-    // });
-));
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -44,19 +26,13 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-//passport
-app.use(passport.initialize());
-app.use(passport.session());
+
 //express session
 app.use(session({secret: 'anything'}));
 
-passport.serializeUser(function(user, done) {
-  done(null, user);
-});
+require('./config/passport')(app);
 
-passport.deserializeUser(function(user, done) {
-  done(null, user);  
-});
+
 
 //routes
 app.use('/', routes);
